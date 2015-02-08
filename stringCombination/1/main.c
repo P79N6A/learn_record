@@ -19,7 +19,6 @@ typedef unsigned int u32;
 */
 void print_string_combi( const char *str )
 {
-	
 	u32 flag=1; //标记
 	u32 max_num;
 	int len = strlen(str); //组合元素个数
@@ -27,7 +26,7 @@ void print_string_combi( const char *str )
 
 	assert( str != NULL );
 	
-	for(i=0; i<len; i++)  //计算最大值，全1
+	for(i=0; i<len; i++)  //计算最大值，全1 --> 2^len
 		max_num |= (1<<i);
 	
 	while( flag <= max_num )
@@ -41,15 +40,19 @@ void print_string_combi( const char *str )
 		printf("}\n");
 		flag++;
 	}
+	printf("Count : %d \n",max_num);	
 }
+
 
 
 int main( void )
 {
-	char string[]="abcdefgh";
+	char string[]="abcdef";
 	print_string_combi( string);
 	
 	return 0;
-
-
 }
+
+
+/*---------------------------------------------------------------------*/
+
