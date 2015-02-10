@@ -11,14 +11,14 @@
 /*
  * 交换两个char
 */
-void swap_char( char *a, char *b)
+void swap_char(char *a, char *b)
 {
 /*	*a=(*a)^(*b);
 	*b=(*a)^(*b);
 	*a=(*a)^(*b); 使用这种方式交换出错，？？？
 */	char kk = *a;
 	*a = *b;
-	*b =kk;
+	*b = kk;
 }
 
  /*
@@ -30,16 +30,16 @@ void swap_char( char *a, char *b)
  {
  	int i;
 	assert(str != NULL);
-	assert(n<m);
+	assert(n < m);
 
-	if(n==m-1)
+	if (n == m-1) 
 	{
-		for(i=0; i<m; i++)
-			printf("%c",*(str+i));
+		for (i = 0; i < m; i++)
+			printf("%c", *(str+i));
 		printf("\n");
 		return;
 	}
-	for(i=n; i<m; i++)
+	for (i = n; i < m; i++)
 	{
 		swap_char((str+n), (str+i)); 	//交换
 		string_array_re(str, m, n+1);
@@ -52,7 +52,7 @@ void swap_char( char *a, char *b)
  * 字符串排列
  * 接口
 */
-void string_array( char *str, int m )
+void string_array(char *str, int m )
 {
 	string_array_re(str, m, 0);
 }
@@ -60,9 +60,9 @@ void string_array( char *str, int m )
 
 int  main( void )
 {
- 	char string[]="abcd";
+ 	char string[] = "abcd";
 	
-	string_array( string, 4 );
+	string_array(string, 4);
 	
 	return 0;	
  }
