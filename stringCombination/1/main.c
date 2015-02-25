@@ -8,9 +8,7 @@
 #include <assert.h>
 #include <string.h>
 
-
 typedef unsigned int u32;
-
 
 /*
  * 使用位标记打印字符串组合
@@ -21,20 +19,20 @@ void print_string_combi(const char *str)
 {
 	u32 flag = 1; //标记
 	u32 max_num;
-	int len = strlen(str); //组合元素个数
+	int len = strlen(str); //组合元素个数 －-> 对应标记位数
 	int i;
 
 	assert(str != NULL);
 	
-	for (i = 0; i < len; i++)  //计算最大值，全1 --> 2^len
+	for (i = 0; i < len; i++)   //计算最大值，全1 --> 2^len
 		max_num |= (1<<i);
-	
+
 	while (flag <= max_num)
 	{
 		printf("{");
 		for (i = 0; i < len; i++)
 		{
-			if ( flag & (1<<i) ) //判断是否为1
+			if (flag & (1<<i)) //判断是否为1
 				printf("%c", *(str+i));
 		}
 		printf("}\n");
@@ -53,6 +51,4 @@ int main(void)
 	return 0;
 }
 
-
-/*---------------------------------------------------------------------*/
 
