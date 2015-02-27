@@ -71,6 +71,9 @@ void print_string_combi(const char *str)
 	ptr_current = ptr_buff;
 	string_combi(ptr_buff, ptr_current, str);
 	printf("Total conbi : %d \n", count);
+
+	//×¢ÒâÊÍ·ÅÄÚ´æ
+	free(ptr_buff);
 	return;
 }
 
