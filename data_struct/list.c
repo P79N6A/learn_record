@@ -1,27 +1,11 @@
-//测试，包含main
 //lcd 20150312
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include "list.h"
 
-/* list's node */
-typedef struct node
-{
-	int info;
-	struct node *link;
-}Node;
-
-/* list's info */
-typedef struct list
-{
-	Node *head;
-	Node *end;
-	Node *current;
-	size_t length;
-}List; 
-
-
+//#define LIST_DEBUG 
 
 //链表初始化
 void list_init(List *list)
@@ -221,7 +205,7 @@ int list_delete_end(List *list, int *delete_info)
 	
 	if (list->current == NULL)
 	{
-		printf("list is empty\n");
+	//	printf("list is empty\n");
 		return -1;
 	}
 	else if (list->head == list->end)
@@ -252,7 +236,7 @@ int list_delete_head(List *list, int *delete_info)
 	assert(list != NULL);
 	if (list->head == NULL)
 	{
-		printf("list is empty");
+	//	printf("list is empty");
 		return -1;
 	}
 	else
@@ -268,6 +252,8 @@ int list_delete_head(List *list, int *delete_info)
 	}
 	return 1;
 }
+
+#ifdef LIST_DEBUG
 
 int main()
 {
@@ -321,5 +307,5 @@ int main()
 	
 	return 0;	
 }
-
+#endif
 
