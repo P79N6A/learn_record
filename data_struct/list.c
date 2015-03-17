@@ -8,18 +8,18 @@
 //#define LIST_DEBUG 
 
 //链表初始化
-void list_init(List *list)
+void list_init(List *plist)
 {
-	assert(list != NULL);
+	assert(plist != NULL);
 
-	list->head = NULL;
-	list->end = NULL;
-	list->current = NULL;
-	list->length = 0;
+	plist->head = NULL;
+	plist->end = NULL;
+	plist->current = NULL;
+	plist->length = 0;
 }
 
 //链表头插入元素
-void list_insert_head(List *list, int info)
+void list_insert_head(List *plist, int info)
 {
 	Node *newNode = (Node *)malloc(sizeof(Node));
 	if (newNode == NULL)
@@ -28,12 +28,12 @@ void list_insert_head(List *list, int info)
 		return;
 	}
 	newNode->info = info;
-	newNode->link = list->head;
+	newNode->link = plist->head;
 	
-	list->head = newNode;
-	if (list->end == NULL) list->end = newNode; //空列表
+	plist->head = newNode;
+	if (plist->end == NULL) plist->end = newNode; //空列表
 	
-	++list->length;
+	++plist->length;
 }
 
 //链表尾插入元素
