@@ -72,9 +72,6 @@ void helper(TreeNode *root, int sum, int path[], int top)
 
 //---------------------------------------------------------------------------------------
 
-
-
-
 int main(void)
 {
 	
