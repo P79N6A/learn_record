@@ -1,11 +1,13 @@
-# learn_record
-c/c++ and other
-lcd 20150208
+#MY_CODE_RECORD
+* 陆潮东
+* Orient
+* 20150527
+* lcdsdream@126.com
 
-
-每个文件夹是一个独立的个体
-学写代码，杂七杂八，记录学习～
-
+##learn
+         学习过程代码记录
+##lib
+          稳定可重用代码保存
 
 
 
