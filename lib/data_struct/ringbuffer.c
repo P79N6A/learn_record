@@ -5,6 +5,8 @@
 	> Created Time: 2015年08月10日 星期一 09时57分52秒
  ************************************************************************/
 
+#define  RING_BUFFER_TEST 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -88,7 +90,7 @@ uint8 ring_buffer_pop( uint8 *data, uint8 *length )
 
 
 /*********************************************************************************/
-/*test ringbuffer*/
+#if RING_BUFFER_TEST
 uint8 counter = 0;
 
 #include <pthread.h>
@@ -132,5 +134,7 @@ int main(void)
     pthread_join(p2, NULL);
     return 0;
 }
+
+#endif 
 
 
