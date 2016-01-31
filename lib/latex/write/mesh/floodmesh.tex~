@@ -1,0 +1,1584 @@
+%
+\documentclass[a4paper, 12pt]{ctexart}
+\usepackage{xcolor}
+\usepackage{setspace}
+
+\newcommand{\nlincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
+\begin{document}
+
+
+\title{Flood Mesh 接口文档}
+\author{jgm，lcd}
+\maketitle
+\newpage
+
+\begin{flushleft}
+
+% 修改 log         
+\huge{修改记录}
+\large
+\begin{itemize}
+        \item 下次修改 
+                \begin{enumerate}
+                        \item \texttt{无} 
+                \end{enumerate}
+	\item 20160117
+		\begin{enumerate}
+			\item \texttt{初始化设备名 : 000+mac[0]-mac[5]}
+			\item \texttt{场景任务更新设备状态 SCENCE\_STATE\_UPDATA，结构同GET\_NODE\_TYPE\_STATE\_ACK一致}
+		\end{enumerate}
+        \item 20160114 
+                \begin{enumerate}
+                        \item \texttt{删除packetId}
+                        \item \texttt{添加mac获取接口}
+                \end{enumerate}
+	\item 20160112
+		\begin{enumerate}
+			\item \texttt{R13上报扫描到的R16列表}
+			\item \texttt{添加,协助手机添加新设备入网接口}
+		\end{enumerate}
+	\item 20160109
+		\begin{enumerate}
+			\item \texttt{修改定时器、延时器接口}
+			\item \texttt{修改插座温湿度、亮度场景接口}
+			\item \texttt{修改R17支持接口}
+		\end{enumerate}		
+	\item 20151228
+		\begin{enumerate}
+			\item \texttt{版本号获取修改}
+			\item \texttt{R17添加TRIGGER\_ID}
+		\end{enumerate}
+	\item 20151222
+		\begin{enumerate}
+			\item \texttt{修改LED控制接口，添加只控制开关不改变亮度命令}
+			\item \texttt{添加校正时间接口}
+		\end{enumerate}
+	\item 2015
+		\begin{enumerate}
+			\item \texttt{添加 R16 连接支持}
+		\end{enumerate}
+	\item 20151124
+		\begin{enumerate}
+			\item \texttt{Mesh内部通信定义，添加R17 支持}
+		\end{enumerate}
+	\item 20151123
+		\begin{enumerate}	
+			\item \texttt{修改场景设置的定时模块，时间段模式}
+		\end{enumerate}
+	\item 20151118
+		\begin{enumerate}
+			\item \texttt{合并led两个状态参数为一个，最高位表示led开关状态，后7位表示亮度值.}
+		\end{enumerate}
+\end{itemize}
+
+
+\newpage
+
+
+
+\begin{spacing}{1.5}
+
+
+
+% 设备广播格式等相关定义说明
+\huge{说明}
+\small
+\begin{enumerate}
+	\item \texttt{广播定义}
+\begin{center}
+        \begin{tabular}{|c|c|c|c|c|}
+                \hline
+                广播头 & 公司标识 UUID32 & 设备状态 UUID32 & 设备类型 UUID32 & 设备名 UUID32 \\
+                \hline
+                3byte & 2+4byte & 2+4byte & 2+ 4byte & 2+3byte \\
+                \hline
+        \end{tabular}
+\end{center}
+共 26 byte
+
+	\item \texttt{UUID定义}
+		\begin{enumerate}
+                        \item \texttt{魅族产品标识\{8d133a90\}} \\
+				\#define UUID\_MANU\_MEIZU 	0x90,0x3A,0x13,0x8D
+			\item \texttt{设备状态}
+				\begin{itemize}
+					\item \texttt{组网后广播数据\{d9d27fa8\}} \\
+				\#define UUID\_ADV\_FLOOD\_MESH\_TYPE 	0xA8,0x7F,0xD2,0xD9 
+					\item \texttt{组网前广播数据\{09ee2728\}} \\
+				\#define UUID\_ADV\_DISCOVERY\_TYPE 0x28,0x27,0xEE,0x09				
+				\end{itemize}
+			\item \texttt{设备类型}
+				\begin{itemize}
+					\item \texttt{Socket\{3ce502e6\}} \\
+				\#define UUID\_DEVICE\_SOCKET 	0xE6,0x02,0xE5,0x3C
+					\item \texttt{Led\{4d0b91f8\}} \\
+				\#define UUID\_DEVICE\_LED 	0XF8,0X91,0X0B,0X4D
+				\end{itemize} 
+		\end{enumerate}
+\end{enumerate}
+
+\newpage
+
+
+% 通信接口说明
+\huge{控制接口定义}
+\small
+
+\begin{enumerate}
+
+\item 分配ID\&KEY
+	\begin{itemize}
+	
+	\item 未组网设备请求ID\&KEY(包长度：2)		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	0x00 & REQUERT\_KEY\_ID(0)\\
+                \hline
+        \end{tabular}
+	
+	\item 分配ID\&KEY(包长度：7)
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & ID & KEY[0]-KEY[3]\\	                
+		\hline
+               	0x55 & ALLOT\_KEY\_ID(1) & XX & 4byte \\ 
+                \hline
+        \end{tabular}
+	
+	\item 设备组网后应答(包长度：3)\\
+	1 : successful 0 : fail\\	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & State \\	                
+		\hline
+               	0x00 & ALLOT\_KEY\_ID\_ACK(2) & 0/1\\ 
+                \hline
+        \end{tabular}
+	
+	\end{itemize}
+
+\item 校验KEY
+	\begin{itemize}
+	
+	\item 设备请求接入校验KEY(包长度：2)		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	0x00 & REQUERT\_CHECK\_KEY(3)\\
+                \hline
+        \end{tabular}
+	
+	\item 发送校验的KEY(包长度：6)
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & KEY[0]-KEY[3]\\	                
+		\hline
+               	0x55 & CHECK\_KEY(4) & 4byte \\ 
+                \hline
+        \end{tabular}
+	
+	\item 设备应答校验结果(包长度：4)\\
+	1 : successful 0 : fail\\	
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & Devie\_id & State \\	                
+		\hline
+               	0x00 & CHECK\_KEY\_ACK(5) & xx & 0/1\\ 
+                \hline
+        \end{tabular}
+	
+	\end{itemize}
+
+\item 获取在线列表
+	\begin{itemize}
+	
+	\item 请求在线列表 (包长度：2)		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & REQUERT\_ONLINE\_TABLE(6)\\
+                \hline
+        \end{tabular}
+	
+	\item 发送在线列表(包长度：11)
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & Total & Index & Id & xx\\	                
+		\hline
+               	0x00 & SEND\_ONLINE\_TABLE(7) & n+1 & 0-n & xx & xx  \\ 
+                \hline
+        \end{tabular}
+		
+	\end{itemize}
+
+\item 设备上下线通知(包长度：10)\\
+	\begin{itemize}
+	\item 
+	State 1 : 上线  0 ： 下线
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & State & Id & xx\\	                
+		\hline
+               	0x00 & MODIFY\_ONLINE\_TABLE(9) & 0/1 & XX & xx   \\ 
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 获取设备名称
+	\begin{itemize}
+	
+	\item 请求设备名 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & GET\_NODE\_NAME(11)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回设备名包 (包长度：11)\\
+	初始化设备名 ： 000+mac[0]-mac[5]\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type  & Name\\	                
+		\hline
+               	srcId & GET\_NODE\_NAME\_ACK(12) & 9Byte  \\ 
+                \hline
+        \end{tabular}
+	
+	\end{itemize}
+
+\item 获取设备MAC
+	\begin{itemize}
+
+	\item 请求设备MAC (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & GET\_NODE\_MAC(103)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回设备MAC (包长度：8)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type  & Mac\\	                
+		\hline
+               	srcId & GET\_NODE\_MAC\_ACK(104) & 6Byte\\ 
+                \hline
+        \end{tabular}
+	
+	\end{itemize}
+
+\item 获取节点Type、状态
+	\begin{itemize}
+
+	\item 获取节点Type,State (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & GET\_NODE\_TYPE\_STATE(13)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回设备Type,State (包长度：4)\\
+	\begin{tabular}{|c|c|c|c|}
+                \hline
+		DisID & Type  & DeviceType & DeviceState\\	                
+		\hline
+                srcId & \nlincell{c}{GET\_NODE\\\_TYPE\_STATE\\\_ACK(14)} & SOCKET/LED & xx\\ 
+                \hline
+        \end{tabular}\\
+	\textcolor{red}{场景任务执行后发送新状态，采用的msg类型为SCENCE\_STATE\_UPDATA，msg格式与上同}
+	\end{itemize}
+
+\item 获取设备版本号
+	\begin{itemize}
+
+  	\item 请求设备版本号 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & GET\_SOFWARE\_VERSION(53)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回设备版本号 (包长度：10)\\
+	版本号 ： "0001-0AABBCCD"
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type  & SWV\_N & SWV\_H\\	                
+		\hline
+                srcId & \nlincell{c}{GET\_SOFWARE\\\_VERSION\_ACK(54)} & 4Byte & 4Byte\\ 
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 获取LED数据
+	\begin{itemize}
+
+  	\item 请求数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & GET\_LED\_DATA(15)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：3)\\
+	State : bit[7] 1/0 -- > 开/关
+		bit[6]-bit[0] -- > 亮度
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type  & State\\	                
+		\hline
+               	srcId & GET\_LED\_DATA\_ACK(16) & xx\\ 
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 获取插座温湿度亮度数据
+	\begin{itemize}
+
+	\item 请求数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & GET\_SOCKET\_TH(17)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：9)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type  & State & T & H & L\\	                
+		\hline
+               	srcId & SOCKET\_TH\_ACK(18) & 0/1 & 2Byte & 2Byte & 2Byte\\ 
+                \hline
+        \end{tabular}
+	
+	\end{itemize}
+
+\item 获取插座电量计数据
+	\begin{itemize}
+
+	\item 请求数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & GET\_SOCKET\_ELE(19)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：9)\\
+	电流I  mA; 功率P *10 w; 电压V = get +200 V\\
+	电量E  *10 kw.h 
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type  & I & P & V & E\\	                
+		\hline
+                srcId & \nlincell{c}{SOCKET\_ELE\\\_ACK(20)} & 2Byte & 2Byte & 1Byte & 4Byte\\ 
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item 设置设备名称
+	\begin{itemize}
+
+	\item 发送数据 (包长度：11)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & name \\	                
+		\hline
+               	ID & SET\_NODE\_NAME(27) & 9byte \\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：11)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		DisID & Type & name \\	                
+		\hline
+               	ID & SET\_NODE\_NAME\_ACK(28) & 9byte \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item 重启设备
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & REBOOT\_NODE(29)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：3)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type  & Time\\	                
+		\hline
+               	srcId & REBOOT\_NODE\_ACK(30) & (s)\\ 
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item 解绑设备
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & RELEASE\_NODE\_ID(31)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：4)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & State & Wait\_time\\	                
+		\hline
+               	srcId & RELEASE\_NODE\_ID\_ACK(32) & 0/1 & (s) \\ 
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item  插座开关
+	\begin{itemize}
+
+	\item 发送数据 (包长度：3)\\
+	Set 1 : 开， 0 ： 关\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & Set\\ 	                
+		\hline
+               	ID & SET\_SOCKET\_RELAY(21) & 0/1\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：3)\\
+	插座执行命令后应答并返回当前状态\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & State\\ 	                
+		\hline
+               	ID & SET\_SOCKET\_RELAY\_ACK(23) & 0/1\\
+                \hline       
+	\end{tabular}
+
+	\end{itemize}
+
+\item LED 控制
+	\begin{itemize}
+	
+	\item 发送数据 (包长度：3)\\
+		State : 最高位表示开关（1：开/ 0：关）；0-7bit 表示亮度 1-100\\
+		0-7bit = 0 表示不修改亮度！！	\\	
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & State\\	                
+		\hline
+               	ID & SET\_LED(23) & XX\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：3)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & State\\	                
+		\hline
+               	ID & SET\_LED\_ACK(24) & XX\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item 清除插座电量统计
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CLEAN\_SOCKET\_ENERGY(25)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：2)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                     \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CLEAN\_SOCKET\_ENERGY\_ACK(26)\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item 协助手机添加设备
+	\begin{itemize}
+
+	\item 发送数据 (包长度：9)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & MAC[0]-MAC[5] & New\_id\\	                
+		\hline
+               	ID & ADD\_NEW\_DEVICE(101) & XX & XX\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：9)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & MAC[0]-MAC[5] & New\_id\\	                
+		\hline
+                ID & \nlincell{c}{ADD\_NEW\_\\DEVICE\_ACK(102)} & XX & XX\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+
+\end{enumerate}
+
+
+\newpage
+
+
+
+% 插座图表统计
+\huge{插座图表统计接口定义}\\
+\small
+\textcolor{red}{统计数据保留整数，先返回最旧数据，当天数据在最后！！}\\
+\begin{enumerate}
+
+\item 读取连续一周每天的最高温度统计 
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CHART\_TEMP\_MAX\_READ(55)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：9)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & 0 & 1 & 2 & 3 & 4 & 5 & 6\\	                
+		\hline
+                ID & \nlincell{c}{CHART\_TEMP\_\\MAX\_READ\_\\ACK(56)} & * & * & * & * & * & * & * \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+
+\item 读取连续一周每天的最低温度统计 
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CHART\_TEMP\_MIM\_READ(57)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：9)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & 0 & 1 & 2 & 3 & 4 & 5 & 6\\	                
+		\hline
+                ID & \nlincell{c}{CHART\_TEMP\\\_MIM\_READ\\\_ACK(58)} & * & * & * & * & * & * & * \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item 读取连续一周每天的最高湿度统计 
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CHART\_RH\_MAX\_READ(59)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：9)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & 0 & 1 & 2 & 3 & 4 & 5 & 6\\	                
+		\hline
+                ID & \nlincell{c}{CHART\_RH\\\_MAX\_READ\\\_ACK(60)} & * & * & * & * & * & * & * \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+
+\item 读取连续一周每天的最低湿度统计 
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CHART\_RH\_MIM\_READ(61)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：9)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & 0 & 1 & 2 & 3 & 4 & 5 & 6\\	                
+		\hline
+                ID & \nlincell{c}{CHART\_RH\\\_MIN\_READ\\\_ACK(62)} & * & * & * & * & * & * & * \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item 读取连续一周每天的最高亮度统计 
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CHART\_LIGHT\_MAX\_READ(63)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：9)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & 0 & 1 & 2 & 3 & 4 & 5 & 6\\	                
+		\hline
+                ID & \nlincell{c}{CHART\_LIGHT\\\_MAX\_READ\\\_ACK(64)} & * & * & * & * & * & * & * \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 读取连续一周每天的最低亮度统计 
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CHART\_LIGHT\_MIM\_READ(65)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：9)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & 0 & 1 & 2 & 3 & 4 & 5 & 6\\	                
+		\hline
+                ID & \nlincell{c}{CHART\_LIGHT\\\_MIM\_READ\\\_ACK(66)} & * & * & * & * & * & * & * \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 读取三天前到六天前的电量数据 （数据先后 6天前->3天前）
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CHART\_ELE\_DAY6\_3\_READ(67)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：10)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & 0 & 1 & 2 & 3 \\	                
+		\hline
+               	ID & CHART\_ELE\_DAY6\_3\_READ\_ACK(68) & 2 & 2 & 2 & 2\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+
+\item 读取今天到两天前的电量数据 （数据先后 2天前->今天）
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CHART\_ELE\_DAY2\_0\_READ(69)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：8)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & 0 & 1 & 2 \\	                
+		\hline
+               	ID & CHART\_ELE\_DAY2\_0\_READ\_ACK(70) & 2 & 2 & 2\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+
+\item 读取四周的电量数据 （数据先后 3周前-> 本周前）
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & CHART\_ELE\_WEEK\_READ(71)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：10)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & 0 & 1 & 2 & 3 \\	                
+		\hline
+               	ID & CHART\_ELE\_WEEK\_READ\_ACK(72) & 2 & 2 & 2 & 2\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\end{enumerate}
+
+\newpage
+
+
+% 场景设置
+\huge{场景设置}\\
+\small
+\begin{enumerate}
+
+\item 场景设置类型定义 \\
+	enum SCENCE\_TYPE \{\\
+	TIMING = 0X00,\\
+	DELAY,\\
+	LIGHT,\\
+	RH,\\
+	TEMP,\\
+	\};
+
+\item 时间校正
+	\begin{itemize}
+
+	\item 发送数据 (包长度：6)\\
+	时间格式 ： H: M : S : W（时：分：秒 : 周）\\		
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & H & M & S & W \\	                
+		\hline
+               	ID & TIME\_SET(35) & 0-23 & 0-59 & 0-59 & 0-6\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：2)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & TIME\_SET\_ACK(36)\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 	定时器资源使用查询
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\	
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & TIMING\_READ\_ALL(37)\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：4)\\
+	Timing\_low [0-7] : 定时器 0-7\\
+	Timing\_high[0-7] : 定时器 8-15\\
+	定时器对应标志位置1，表示有数据，0，无数据；\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & Timing\_low & Timing\_high \\	                
+		\hline
+                ID & \nlincell{c}{TIMING\_READ\\\_ALL\_ACK(38)} & * & * \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 	指定定时器资源使用查询
+	\begin{itemize}
+
+	\item 发送数据 (包长度：3)\\	
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type  & No\\	                
+		\hline
+               	ID & TIMING\_READ\_SINGLE(39) & X\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：4)\\
+	oh : open hour ; cm : close minute ; w : weekRepeat\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & No & state & oh & om & ch & cm & w\\	                
+		\hline
+                ID & \nlincell{c}{TIMING\_READ\\\_SINGLE\_ACK(40)} & * & * & * & * & * & * & * \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 	定时期任务批量删除
+	\begin{itemize}
+
+	\item 发送命令 (包长度：4)\\
+	Timing\_low [0-7] : 定时器 0-7\\
+	Timing\_high[0-7] : 定时器 8-15\\
+	定时器对应标志位置1，表示清除\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & Timing\_low & Timing\_high \\	                
+		\hline
+               	ID & TIMING\_DELETE(41) & * & * \\
+                \hline
+        \end{tabular}
+	
+	\item 发送数据 (包长度：2)\\	
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & TIMING\_DELETE\_ACK(42)\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item 	定时任务设置（添加， 修改和删除）
+	\begin{itemize}
+
+	\item 发送数据 (包长度：9)\\
+	No : 定时器序号 0-15\\
+	state : 0-清除；1-设置启动；2-暂停任务;\\		
+	oh:om : 定时开时间点\\
+	ch:cm : 定时关时间点\\	
+	w : 	bit[0]-bit[6]写1表示任务重复执行，bit[7]一直为1, 0x80 表示一次性任务\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type & No & state & oh & om & ch & cm & w\\	                
+		\hline
+               	ID & TIMING\_SET(43) & * & * & * & * & * & * & * \\
+                \hline
+        \end{tabular}
+        
+	\item 返回数据 (包长度：3)\\
+	State ： \\
+	0 : 设置成功\\
+	1 : 越界设置（超出定时器序号范围）\\
+	2 : 尝试sleep 未设置定时器\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type  & State\\	                
+		\hline
+               	ID & TIMING\_SET\_ACK(44) & X\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item  延时任务读取
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & DELAY\_READ(45)\\
+                \hline
+        \end{tabular}
+        
+	\item 返回数据 (包长度 12)\\
+	State ： \\
+	0 : 没有设置倒计时器\\
+	1 : 倒计时任务运行中\\
+	2 : 倒计时任务暂停中\\
+        3 : 倒计时任务完成\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  & State & Delay\_minute  & remainder\_minute& Action\\	                
+		\hline
+                ID & \nlincell{c}{DELAY\_READ\\\_ACK(46)} & * & 4Byte  & 4Byte & *\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item  延时任务设置
+	\begin{itemize}
+
+	\item 设置任务(包长度 12)\\
+	State ： \\
+	        0 : 删除任务\\
+        	1 : 设置更新并启动延时任务\\
+	        2 : 任务暂停\\
+        Delay\_minute : 
+                倒计时分钟数
+        Action :
+                任务执行动作
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  & State & Delay\_minute & remainder\_minute& Action\\
+                \hline
+                ID & DELAY\_SET(47) & * & 4Byte & 4Byte & *\\
+                \hline
+        \end{tabular}
+
+        \item 设备应答(包长度：2)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & DELAY\_SET\_ACK(48)\\
+                \hline
+        \end{tabular}
+        
+	\end{itemize}
+
+
+\item  插座传感器场景设置读取（温度/湿度/亮度）
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	ID & SCENCE\_SOCKET\_SENSOR\_READ(49)\\
+                \hline
+        \end{tabular}
+       
+	\item 返回数据 (包长度 8)\\
+        Sensor  : LIGHT=2, RH=3,TEMP=4\\
+        \textcolor{red}{如果没有设置任务，该栏返回0XFF}\\
+	D       : 设置临界点 2byte\\
+        GOL     : 大于写1, 小于写0\\
+        Action  : 插座开关\\
+        State   : 0 任务没有启用 ; 1 任务工作中\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  & Sensor & D & GOL & Action & State\\	                
+		\hline
+                ID & \nlincell{c}{SCENCE\_SOCKET\\\_SENSOR\_READ\\\_ACK(50)} & 2/3/4/0XFF & 2Byte & 0/1 & 0/1 & *\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item  插座传感器场景设置（温度/湿度/亮度）
+	\begin{itemize}
+ 
+	\item 设置数据 (包长度 8)\\
+        Sensor  : LIGHT=2, RH=3,TEMP=4\\
+	D       : 设置临界点 2byte\\
+        GOL     : 大于写1, 小于写0\\
+        Action  : 插座开关\\
+        State   : 0 任务挂起 ; 1 任务设置启动 ； 0Xff 清除任务\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  & Sensor & D & GOL & Action & State\\	                
+		\hline
+                ID & \nlincell{c}{SCENCE\_SOCKET\\\_SENSOR\_SET(51)} & 2/3/4 & 2Byte & 0/1 & 0/1 & *\\
+                \hline
+        \end{tabular}
+
+	\item 发送数据 (包长度：3)\\
+        State : 1 设置成功 ；0 设置错误
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & State\\	                
+		\hline
+               	ID & SCENCE\_SOCKET\_SENSOR\_SET\_ACK(52) & 0/1\\
+                \hline
+        \end{tabular}
+      
+	\end{itemize}
+
+
+\end{enumerate}
+
+\newpage
+
+
+
+
+
+% R16接口
+\huge{R16接口}\\
+\small
+\begin{enumerate}
+
+\item 手机通知R13连接R16 
+	\begin{itemize}
+
+	\item 发送数据 (包长度：9)\\
+        Dis time ： R13 同R16 保持连接的时间 ×10s\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & R16 MAC & Dis time\\	                
+		\hline
+                0xFB & R16\_CONN(91) & mac[0]-mac[5] & /10s\\
+                \hline
+        \end{tabular}
+	
+	\item R13返回数据 (包长度：2)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                     \hline
+		DisID & Type \\	                
+		\hline
+               	0 & R16\_CONN\_ACK(92)\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 手机获取R13扫描的R16列表 
+	\begin{itemize}
+
+	\item 手机发送数据 (包长度：2)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+               	0 & R16\_GET\_SCAN\_LIST(99)\\
+                \hline
+        \end{tabular}
+
+	\item 返回数据 (包长度 :25)\\
+        \textcolor{red}{包长度超过12byte， 走0xC0， 0X02类型包!}\\
+        State : 1 当前同R13保持连接的R16\\ 
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & Mac & name & State \\
+                \hline
+                0xFB & \nlincell{c}{R16\_GET\_SCAN\\\_LIST\_ACK(100)} & mac[0]-mac[5] & 16byte & * \\
+                \hline
+        \end{tabular}
+	
+	\end{itemize}
+
+\item 手机通知R13断开同R16的连接 
+	\begin{itemize}
+
+	\item 发送数据 (包长度：2)\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type \\	                
+		\hline
+                0xFB & R16\_DISCONN(93)\\
+                \hline
+        \end{tabular}
+	
+	\item R13返回数据 (包长度：2)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                     \hline
+		DisID & Type \\	                
+		\hline
+               	0 & R16\_DISCONN\_ACK(94)\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item R13连接上R16后通知手机(包长度：8)\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & mac[0]-mac[5]\\	                
+		\hline
+                0xFB & R16\_CONNECTED(95) & 6byte\\
+                \hline
+        \end{tabular}
+
+\item 建立连接后， 手机通过R13 wifi 发送数据给R16的格式说明\\
+        封包格式 ： \\
+        \begin{tabular}{|c|c|c|c|c|}
+                \hline
+                包头 & Type & Len & 数据段 & 包尾\\
+                \hline
+                0xC0 & 0X01 & 2Byte & 发给R16的封包 & 0xC0\\
+                \hline
+        \end{tabular}\\
+        数据段为手机发送给R16的完整报文，对于发码控制，为多个报文组包。\\
+        其中手机发送给R16进行红外发码的数据 ：\\
+        \begin{center}
+                \textcolor{red}{红外码问询包 + 红外码完整包}
+        \end{center}                   
+
+\item 红外码完整包16送数据到13，通过R13 发回手机，格式同上一致。
+       
+
+
+\end{enumerate}
+
+\newpage
+
+
+
+
+
+% R17接口
+\huge{R17接口}\\
+\small
+\begin{center}
+        \textcolor{red}{手机必须读取R17 设置数据并获取对应的ID 后才能进行任务的添加}
+\end{center}
+
+\begin{enumerate}
+
+\item R17 任务添加/修改/删除
+        \begin{itemize}
+
+        \item 手机命令(包长度：12)
+        \begin{itemize}
+                \item R17 ID    : R17索引， 映射MAC，用于读取R17的配置数据\\
+                \item Index     :\\
+                        \begin{tabular}{|c|c|}
+                                \hline
+                                高4bit & 低4bit \\
+                                \hline
+                                GROUP ID & TASK ID\\
+                                \hline
+                        \end{tabular}\\
+                        GROUP ID  : 1-15手机分配，捆绑多个任务为一组的标志\\
+                        \begin{center}
+                                单个任务默认组号为0\\
+                        \end{center}
+                        TASK ID   : 每个R17 设备承载任务数16, 对应0-15\\
+                \item srcId     : mesh 节点id
+                \item op        : 设备控制
+                \item Time      : 任务执行（不执行）时间段
+                        \begin{tabular}{|c|c|c|c|c|}
+                                \hline
+                                Hour start & Minute start & Hour end & Minute end & Week repeat\\ 
+                                \hline
+                                * & * & * & * & 同定时器\\
+                                \hline
+                        \end{tabular}
+                \item Flag      : 
+                        \begin{tabular}{|c|c|c|c|}
+                                \hline
+                                bit[7]-bit[5] & bit[4]-bit[3] & bit[2]-bit[1] & bit[0]\\
+                                \hline
+                                保留 & \nlincell{c}{0:删除对应Index[3-0]任务\\1:添加/更新任务\\2:暂停任务}
+                                & \nlincell{c}{0:无任务时间段\\1:时间段内执行任务\\2：时间段内不执行任务}
+                                &\nlincell{c}{门磁状态：\\0： 关\\ 1： 开}\\
+                                \hline
+                        \end{tabular}
+        \end{itemize}
+        
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & R17 ID & Index & srcId & op & Time & Flag \\	                
+		\hline
+                0xFB & R17\_MESH\_SETUP(75) & 1B & 1B & 1B & 1B & 5B & 1B \\
+                \hline
+        \end{tabular}
+
+
+        \item R13应答(包长度 : 3)\\
+        State : 
+        \begin{itemize}
+                \item 0 成功设置
+                \item 1 设置R17 ID超出范围
+                \item 2 设置R17 任务超出范围
+                \item 3 task confilc 
+        \end{itemize}
+        \begin{tabular}{|c|c|c|}
+                \hline
+                DisId & Type & State \\
+                \hline
+                0X00  & R17\_MESH\_SETUP\_ACK(76) & *\\
+                \hline
+        \end{tabular}
+
+        \end{itemize}
+
+
+\item R17 任务读取
+        \begin{itemize}
+        
+        \item 手机发送R17 MAC获取R17 配置数据(包长度：8)
+        \begin{tabular}{|c|c|c|}
+                \hline
+                DisId & Type & R17 MAC\\
+                \hline
+                0xFB & R17\_MESH\_READ(73) & MAC[0]-MAC[5]\\
+                \hline
+        \end{tabular}
+
+        \item R13应答
+        \begin{itemize}
+                \item 控制包（包长度：12）\\
+                \begin{itemize}
+                        \item R17ID : 索引R17设置数据，添加R17 超过限制返回0XFF
+                        \item Total : R17当前设置了的任务总数
+                        \item GroupIdMark : bit[0]-bit[15] 置1 表示已经使用
+                        \item TaskIdMark  : bit[0]-bit[15] 置1 表示已经使用               
+                \end{itemize}
+                \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                        \hline
+                        DisId & Type & no & R17MAC & R17ID & Total & \nlincell{c}{Group\\IdMark} 
+                              & \nlincell{c}{Task\\IdMark}\\
+                        \hline
+                        0xFB & \nlincell{c}{R17\_MESH\\\_READ\_ACK(74)} & \textcolor{red}{0} 
+                             & \nlincell{c}{MAC[0]\\-MAC[2]} & 0-15 & n & 2B & 2B\\
+                        \hline
+                \end{tabular}
+                \item 每个任务详细配置包（包长度：12）
+                \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                        \hline
+                        DisID & Type & no & Index & srcId & op & Time & Flag \\	                
+		        \hline
+                        \textcolor{red}{R17ID} & R17\_MESH\_READ\_ACK(74) & 1-n & 1B & 1B & 1B & 5B & 1B \\
+                \hline
+        \end{tabular}\\
+        \textcolor{red}{
+(手机获取设置列表后，根据R17IDGROUPIDTASKID进行任务设置默认GROUPID为0(多个复用)表示独立任务，多条任务一组由手机设置相同GROUPID)}
+        \end{itemize}
+
+        \end{itemize}
+
+
+\item 批量删除任务
+        \begin{itemize}
+
+	\item 发送命令 (包长度：5)\\
+	Task\_low [0-7] : 任务 0-7\\
+	Task\_high[0-7] : 任务 8-15\\
+	定时器对应标志位置1，表示清除\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & R17ID & Task\_low & Task\_high \\	                
+		\hline
+                0XFB & R17\_DELETE\_BATCH(79) & * & * & * \\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：2)\\	
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+                ID & R17\_DELETE\_BATCH\_ACK(80)\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+\item 按组删除任务
+        \begin{itemize}
+
+	\item 发送命令 (包长度：4)\\
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & R17ID & GROUP ID \\	                
+		\hline
+                0XFB & R17\_DELETE\_GROUP(77) & * & *\\
+                \hline
+        \end{tabular}
+	
+	\item 返回数据 (包长度：2)\\	
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+		DisID & Type \\	                
+		\hline
+                ID & R17\_DELETE\_GROUP\_ACK(78)\\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+
+
+\item R17 任务变化通知
+        \begin{itemize}
+        \item 状态说明
+        \begin{itemize}
+                \item 0XF1(门磁开0x0，电池电量足)
+                \item 0XF3(门磁关，电池电量足)
+                \item 0X01(门磁开，电池电量低)
+                \item 0X03(门磁关，电池电量低)
+                \item 0xFF(设备信号丢失)
+	\end{itemize}
+	
+        \item 上传数据(包长度：9)\\	
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  &  R17 MAC & State\\	                
+		\hline
+                ID & R17\_STATE\_UPDATE(87) & mac[0]-mac[5] & x \\
+                \hline
+        \end{tabular}
+
+	\end{itemize}
+
+\item 读取R17开关log\\
+        待定
+
+\end{enumerate}
+
+\newpage
+
+
+
+
+% 内部通信报文说明
+\huge{内部msg}
+\small
+\begin{enumerate}
+
+\item ONLINE TABLE
+        \begin{enumerate}
+        \item 最小节点广播当前在线设备数目(包长度：3)
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  &  Count \\	                
+		\hline
+                ID & ONLINE\_ADV(33) & x \\
+                \hline
+        \end{tabular}
+
+        \item 每个节点定时广播（包长度：3）
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  &  DeviceType \\	                
+		\hline
+                ID & ONLINE\_ADV\_ACK(34) & x \\
+                \hline
+        \end{tabular}
+
+        \end{enumerate}
+
+\item R17 support
+        \begin{enumerate}
+        \item R13通知其他设备搜索连接R17
+        \begin{enumerate}
+        \item 发送数据包(包长度：8)\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & mac\\	                
+		\hline
+                0xFF & R17\_START\_PAIR(81) & MAC[0]-MAC[5]\\
+                \hline
+        \end{tabular}
+
+        \item 连接上R17的节点应答数据包（包长度：8）\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & mac\\	                
+		\hline
+                SrcID & R17\_START\_PAIR\_ACK(82) & MAC[0]-MAC[5]\\
+                \hline
+        \end{tabular}
+
+        \end{enumerate}
+
+
+        \item R13设置监听R17的节点
+        \begin{enumerate}
+        \item 发送数据包(包长度：8)\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & mac\\	                
+		\hline
+                xx & R17\_PAIR\_SETUP(83) & MAC[0]-MAC[5]\\
+                \hline
+        \end{tabular}
+        
+        \item 节点应答数据包（包长度：3）\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & state\\	                
+		\hline
+                0XFB & R17\_PAIR\_SETUP\_ACK(84) & 0/1\\
+                \hline
+        \end{tabular}
+
+        \end{enumerate}
+
+
+        \item R13解除监听R17的节点
+        \begin{enumerate}
+        \item 发送数据包(包长度：8)\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & mac\\	                
+		\hline
+                xx & R17\_UNPAIR\_SETUP(85) & MAC[0]-MAC[5]\\
+                \hline
+        \end{tabular}
+        
+        \item 节点应答数据包（包长度：3）\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & state\\	                
+		\hline
+                0XFB & R17\_UNPAIR\_SETUP\_ACK(86) & 0/1\\
+                \hline
+        \end{tabular}
+
+        \end{enumerate}
+
+        \item 监听R17的节点更新R17状态
+        \begin{enumerate}
+        \item 状态说明
+        \begin{itemize}
+                \item 0XF1(门磁开0x0，电池电量足)
+                \item 0XF3(门磁关，电池电量足)
+                \item 0X01(门磁开，电池电量低)
+                \item 0X03(门磁关，电池电量低)
+                \item 0xFF(设备信号丢失)
+	\end{itemize}
+	
+        \item 上传数据(包长度：11)\\	
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  &  R17 MAC & State & TriggerId\\	                
+		\hline
+                ID & R17\_STATE\_UPDATE(87) & mac[0]-mac[5] & x & 2B \\
+                \hline
+        \end{tabular}
+        
+        \item R13应答数据包（包长度：2）\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type\\	                
+		\hline
+                0XFB & R17\_STATE\_UPDATE\_ACK(88)\\
+                \hline
+        \end{tabular}
+
+	\end{enumerate}
+
+        \item R17状态变化，R13发送op给联动节点
+        \begin{enumerate}
+        \item 发送数据包(包长度：3)\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type & op\\	                
+		\hline
+                ID & R17\_SEND\_OPTION(89) & **  \\
+                \hline
+        \end{tabular}
+
+        \item 应答数据包（包长度：2）\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type\\	                
+		\hline
+                srcId & R17\_SEND\_OPTION\_ACK(90) \\
+                \hline
+        \end{tabular}
+
+        \end{enumerate}
+
+        \end{enumerate}
+
+\item Test
+        \begin{enumerate}
+        \item 发送数据包(包长度：2)\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type\\	                
+		\hline
+                ID & PACKET\_TEST(254)  \\
+                \hline
+        \end{tabular}
+
+        \item 应答数据包（包长度：2）\\
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type\\	                
+		\hline
+                ID & PACKET\_TEST\_ACK(255) \\
+                \hline
+        \end{tabular}
+
+        \end{enumerate}
+
+\end{enumerate}
+
+\end{spacing}
+\end{flushleft}
+\end{document}
+

@@ -1,0 +1,70 @@
+%
+\documentclass[a4paper, 12pt]{ctexart}
+\usepackage{xcolor}
+\usepackage{setspace}
+
+\newcommand{\nlincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
+\begin{document}
+
+
+\title{Flood Mesh 接口文档}
+\author{jgm，lcd}
+\maketitle
+\newpage
+
+\begin{flushleft}
+
+% 修改 log         
+\huge{修改记录}
+\large
+\begin{itemize}
+        \item 下次修改 
+                \begin{enumerate}
+                        \item \texttt{无} 
+                \end{enumerate}
+\end{itemize}
+
+
+\newpage
+
+
+
+\begin{spacing}{1.5}
+
+
+
+
+% 内部通信报文说明
+\huge{内部msg}
+\small
+\begin{enumerate}
+
+\item ONLINE TABLE
+        \begin{enumerate}
+        \item 最小节点广播当前在线设备数目(包长度：3)
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  &  Count \\	                
+		\hline
+                ID & ONLINE\_ADV(33) & x \\
+                \hline
+        \end{tabular}
+
+        \item 每个节点定时广播（包长度：3）
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+                \hline
+                DisID & Type  &  DeviceType \\	                
+		\hline
+                ID & ONLINE\_ADV\_ACK(34) & x \\
+                \hline
+        \end{tabular}
+
+        \end{enumerate}
+
+\end{enumerate}
+
+\end{spacing}
+\end{flushleft}
+\end{document}
+

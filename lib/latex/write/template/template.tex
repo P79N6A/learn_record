@@ -1,0 +1,74 @@
+\documentclass[a4paper, 12pt]{ctexart}
+\usepackage{xcolor}
+\usepackage{setspace}
+\begin{document}
+\begin{spacing}{1.5}  %设置行间距
+
+\title{你好， latax}
+\author{lcd}
+\maketitle
+\newpage
+
+
+\begin{flushleft}
+        \large{陆潮东的latex}\\
+        \huge{很大的前言}
+
+        多空一行来断行
+
+        \bf{换个行} \\
+        \vspace{2ex}   % 空行， 2 个字母高度
+        靠右
+\end{flushleft}
+
+\begin{flushright}
+        \textcolor{red}{靠左}
+\end{flushright}
+
+
+\begin{center}
+        中间
+\end{center}
+
+\begin{itemize}
+        \item 1 nihao \texttt{enumerate}
+                \begin{enumerate}
+                        \item nimei
+                        \item womei
+                \end{enumerate}
+        \item 2 wohao \texttt{description}
+\end{itemize}
+
+
+\newpage
+
+\begin{tabular}{c|c}
+        \hline
+        a & b \\
+        \hline
+        c & d \\
+        \hline
+\end{tabular}
+
+\begin{center}
+        \begin{tabular}{|c|c|}
+                \hline
+                a & b \\ \hline
+                c & d \\
+                \hline
+        \end{tabular}
+\end{center}
+
+\begin{center}
+        HELLO \\ 
+        \begin{tabular}{|c|c|c|}
+                \hline
+                a & b & head \\ 
+                \hline
+                c & d & \textbf{你好} \\
+                \hline
+        \end{tabular}
+\end{center}
+
+\end{spacing}
+\end{document}
