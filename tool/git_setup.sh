@@ -10,7 +10,7 @@ echo "*.swp" >> ~/.gitignore
 
 git config --global core.excludesfile ~/.gitignore
 git config --global user.name luchaodong
-git config --global usr.email lcdsdream@126.com
+git config --global user.email lcdsdream@126.com
 
 git config --list
 
