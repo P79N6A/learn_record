@@ -1,12 +1,13 @@
 #MY_CODE_RECORD
-* Orient
+* Orient lu
 * 20150527
-* lcdsdream@126.com
+* [mail](lcdsdream@126.com)
+* [简书](http://www.jianshu.com/users/ad07ec20e157/latest_articles)
 
 ##learn
-         学习代码记录
 ##lib
-        保存下
+##tool
+
 
 
 
