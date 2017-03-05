@@ -13,11 +13,9 @@ void leftShiftOne(char *str, int len)
 {
 	char temp = *str; //保留第一个
 	int i;
-	
 	len = len - 1;
 	for (i = 0; i < len; ++i)
 		str[i] = str[i+1];
-	
 	str[len] = temp;
 }
 

@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include<stdio.h>
+#include<assert.h>
 
 // if a == b , it cause error!! --> 0
 // 不一定高效， 别用了
@@ -48,6 +49,7 @@ void quick_sort(int *array, int begin, int end)
 	int *pvote = array + begin;
 	int l = begin + 1;
 	int r = end;
+	//后来 ， 感觉这个处理方法，打断了流水线，效率反而不高
 	while (l < r) {
 		if (array[l] < *pvote) {
 			++l;
@@ -64,6 +66,37 @@ void quick_sort(int *array, int begin, int end)
 	quick_sort(array, r, end);
 }
 
+// this better than before
+void quick_sort1(int *array, int begin, int end)
+{
+	assert(array != NULL);
+	if (begin >= end) return;
+
+	set_pvote(array, begin, end);
+
+	int temp = array[begin];
+	int hole = begin;
+	int l = begin + 1;
+	int r = end;
+
+	while (l <= r) {
+		while (array[r] >= temp && l <= r) --r;
+		if (l <= r) {
+			array[hole] = array[r];
+			hole = r--;
+		}
+
+		while (array[l] < temp && l <= r) ++l;
+		if (l <= r) {
+			array[hole] = array[l];
+			hole = l++;
+		}
+	}
+	array[hole] = temp;
+	quick_sort1(array, begin, hole - 1);
+	quick_sort1(array, hole + 1, end);
+}
+
 int main (void)
 {
 	int ary[] = {73, 66, 33, 12, 20, 56, 97, 12, 43, 71, 12, 50, 43, 48, 43,
@@ -73,7 +106,7 @@ int main (void)
 		printf("%d ", ary[i]);
 	printf("\n");
 
-	quick_sort(ary, 0, sizeof(ary)/sizeof(int) - 1);
+	quick_sort1(ary, 0, sizeof(ary)/sizeof(int) - 1);
 
 	for (i = 0; i < sizeof(ary)/sizeof(int); ++i)
 		printf("%d ", ary[i]);

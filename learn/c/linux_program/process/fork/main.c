@@ -11,33 +11,24 @@
 int main(void)
 {
 	pid_t pid;
-	char *message;
-	int n;
-	
+
 	pid = fork();
-	if (pid < 0)
-	{
-		/* fork 失败　*/
-		perror("fork failed\n");
+	if (pid < 0) {
+		perror("Fork failed");
 		exit(1);
 	}
-/*　在此处程序开始分叉 */
-	
-	if (pid == 0)
-	{
-	/* 返回０，处于子进程　*/
-		message = "This is the child\n";
-		n = 6; 
+	// fork here
+	if (pid == 0) {
+		printf("Child\n");
+
+		exit(1);
+	} else {
+		printf("Parent\n");
+
+		int status = 0;
+		waitpid(pid, &status, 0);
+		printf("Child %d quit %d\n", pid, status);
+		printf("The return code is %d\n",WEXITSTATUS(status));
+		exit(0);
 	}
-	else
-	{
-		message = "This is the parent\n";
-		n = 3;
-	}
-	for(; n > 0; n--)
-	{
-		printf("%s\n", message);
-		sleep(1);
-	}
-	return 0;
 }
