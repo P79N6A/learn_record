@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout 1200
+set ip [lindex $argv 0]
+set name [lindex $argv 1]
+set passwd [lindex $argv 2]
+set port [lindex $argv 3]
+
+spawn ssh -p $port -l $name $ip
+    expect {
+        "yes/no"  {send "yes\r"; exp_continue}
+        "assword:" {send $passwd\r";}
+        expect eof
+       }
+sleep 1
+interact
+
