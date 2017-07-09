@@ -1,0 +1,8 @@
+// orientlu test 1
+syntax = "proto2";
+option optimize_for = LITE_RUNTIME;
+
+message TestMessage {
+    required int64 id = 1;
+    required string message = 2;
+}
