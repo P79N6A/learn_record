@@ -146,6 +146,6 @@ if __name__=='__main__':
     name = './test.html'
     #line_plots(name)
     #scatter_plots(name)
-    #bar_charts(name)
+    bar_charts(name)
     #pie_charts(name)
-    filled_area_plots(name)
+    #filled_area_plots(name)
