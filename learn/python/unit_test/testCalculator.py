@@ -3,7 +3,11 @@
 
 import sys
 import unittest
-from unittest import mock
+## if python 3, mock is in unittest
+#from unittest import mock
+## if python 2, you nedd to install module mock
+## pip install mock
+import mock
 from calculator import Calculator
 
 def my_print(str):
