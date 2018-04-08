@@ -40,7 +40,7 @@ print("> Get float port = %f type : %s"%(float_port, type(float_port)))
 """
 return Fallback Values when value can not find(normal section and DEFAULT)
 """
-print("\n- Retur Fallback")
+print("\n- Return Fallback")
 print("> Get value user = %s"%(config.get('bitbucket.org', 'user')))
 print("> Get value user = %s"%(config.get('bitbucket.org', 'user', fallback="fallback_name")))
 print("> Get value forwardx11 = %s"%(config.getboolean('bitbucket.org', 'forwardx11', fallback=False)))
