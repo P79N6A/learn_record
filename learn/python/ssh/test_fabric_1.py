@@ -100,6 +100,8 @@ class ssh_client(object):
 
 
 if __name__ == "__main__":
+    #env.skip_bad_hosts = True
+    #env.colorize_errors = True
     ## 主机登录信息
     hosts_list = {
             "lcd@192.168.37.134" : "jklfds",
@@ -119,7 +121,7 @@ if __name__ == "__main__":
 
     client = ssh_client(hosts_list, roles_list)
 
-    result = client.remote_cmd("ls | wc -l", roles=["role1", "role4"])
+    result = client.remote_cmd("ls | wc -l", roles=["role1", "role3"])
     print result
 
     result = client.local_cmd("rm ./aa")
