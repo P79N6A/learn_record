@@ -7,7 +7,7 @@
 
 #include<iostream>
 #include<memory>
-
+//auto_prt 和 shared_ptr 的差别
 void self_del(int* ptr)
 {
     std::cout << "call selfdef delfun value : " << *ptr << std::endl;
