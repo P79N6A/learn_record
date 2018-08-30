@@ -11,12 +11,13 @@ class ssh_client(object):
 
         env.hosts=[]
         env.passwords={}
-        env.roledefs={}
+        env.roledefs = {}
 
         if hosts_list != None:
             for key in hosts_list.keys():
                 env.hosts.append(key)
                 env.passwords[key] = hosts_list[key]
+
         if roles_list != None:
             for key in roles_list.keys():
                 env.roledefs[key] = roles_list[key]
@@ -28,6 +29,7 @@ class ssh_client(object):
                 result = run(cmd, shell=False,warn_only=True,quiet=True)
         else:
             result = run(cmd, shell=False,warn_only=True,quiet=True)
+
         return result
 
 
@@ -40,7 +42,7 @@ class ssh_client(object):
         if is_parallel == 1:
             func = fabric.api.parallel(func)
 
-        result=execute(func,cmd)
+        result=execute(func,cmd,path)
         return result
 
 
@@ -48,9 +50,10 @@ class ssh_client(object):
         result = None
         if path == None:
             path = './'
-        with lcd(path):
-            with settings(warn_only=True):
-                result = local(cmd, capture=1)
+            with lcd(path):
+                with settings(warn_only=True):
+                    result = local(cmd, capture=1)
+
         return result
 
     def _get_file(self, remote_path=None, file_name=None, local_path='./', alias=None):
@@ -59,9 +62,10 @@ class ssh_client(object):
                 with lcd(local_path):
                     if alias == None:
                         alias = file_name
-                    result = get(file_name, alias)
-        else:
-            result = None
+                        result = get(file_name, alias)
+                    else:
+                        result = None
+
         return result
 
     def get_file(self, remote_path=None, file_name=None, local_path='./', alias=None, roles=None):
@@ -80,9 +84,10 @@ class ssh_client(object):
                 with cd(dst_path):
                     if alias == None:
                         alias = file_name
-                    result = put(file_name, alias)
-        else:
-            result = None
+                        result = put(file_name, alias)
+                    else:
+                        result = None
+
         return result
 
     def put_file(self, src_path='./', file_name=None, dst_path=None, alias=None, roles=None, is_parallel=0):
@@ -96,7 +101,6 @@ class ssh_client(object):
 
         result=execute(func,src_path, file_name, dst_path, alias)
         return result
-
 
 
 if __name__ == "__main__":
