@@ -1,0 +1,5 @@
+RVO（Return Value Optimization）
+
+g++ disable
+-fno-elide-constructors
+
