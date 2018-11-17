@@ -1,0 +1,6 @@
+## test
+--is_test=true
+
+## server config
+--server_ip=10.125.34.22
+
