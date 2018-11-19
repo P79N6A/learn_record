@@ -1,0 +1,14 @@
+
+
+--listen_num=1024
+--port=8888
+
+--thread_num=2
+
+## if true , 输出到屏幕，不输出到file
+--logtostderr=false
+## log 实时输出时
+#--logbufsecs=0
+
+# 默认值是 2，代表INFO (1 代表WARNING，2 代表ERROR，而 3 代表FATAL)
+#--minloglevel=0

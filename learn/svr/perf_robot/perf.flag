@@ -1,0 +1,24 @@
+## test
+--is_test=true
+
+## server config
+--server_ip=10.125.34.22
+--server_port=8888
+
+
+## perf config
+--perf_work_thread_num=2        ## default : cpu num
+--perf_robot_num=200             ## 连接数，分摊到 work thread
+--perf_robot_start_id=2333      ## 连接自定义id, 递增
+
+### 连接设置
+--perf_is_reconn=true           ## 是否重连
+
+### 发包设置
+--perf_robot_send_per_sec=100    ## 单个连接每秒发包数
+
+##  待实现
+--perf_conn_per_sec=0           ## 建立连接每秒限制，0 不限制
+--perf_robot_is_send_sync=false  ## 收发同步
+--perf_robot_send_sync_timeout=0 ## 同步下，x ms超时处理
+
