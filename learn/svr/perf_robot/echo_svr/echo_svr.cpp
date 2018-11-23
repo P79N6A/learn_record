@@ -42,7 +42,7 @@ typedef struct Worker_thread
     pthread_t thread_id;        //线程ID
     struct event_base *base;   //事件根基
 
-    // main thread notify new connection
+        // main thread notify new connection
     int notify_receive_fd;
     int notify_send_fd;
 
@@ -295,6 +295,11 @@ int main(int argc, char *argv[])
     event_base_priority_init(base, 1);
     struct event *sigint_event = event_new(base, SIGINT, EV_SIGNAL |EV_PERSIST, sigint_cb, base);
     event_add(sigint_event, NULL);
+
+// write to close socket will rasie
+#ifdef SIGPIPE
+    signal(SIGPIPE, SIG_IGN);
+#endif
 
     // report collect
     for (int i = 0; i < FLAGS_thread_num; ++i) {
