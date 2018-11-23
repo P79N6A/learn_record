@@ -32,14 +32,12 @@ static void sigIntHandler(int signum)
     signal(SIGINT, sigIntHandler);
 }
 
-static pid_t save_pid(void)
+static void save_pid(pid_t pid)
 {
-    pid_t pid = getpid();
     std::ofstream out;
     out.open("./perf.pid", std::ios::out | std::ios::trunc);
     out << pid;
     out.close();
-    return pid;
 }
 
 int main(int argc, char* argv[])
@@ -52,7 +50,8 @@ int main(int argc, char* argv[])
 	google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
 
-    pid_t _pid = save_pid();
+    pid_t _pid = getpid();
+
     signal(SIGINT, sigIntHandler);
 
 // write to close socket will rasie
@@ -68,6 +67,7 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Init error, code %d", ret);
 
     } else {
+        save_pid(_pid);
         ret = g_mother->StartLoop();
         if (ret != 0) {
             LOG(ERROR) << "StartLoop error, code : " << ret;

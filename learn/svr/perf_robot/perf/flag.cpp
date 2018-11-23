@@ -19,12 +19,15 @@ DEFINE_int32(perf_robot_send_per_sec, 10, "send speed /s");
 
 //内部设置
 DEFINE_int32(report_mq_size, FLAGS_perf_work_thread_num * 3, "mq for child report stat to mother");
+DEFINE_int32(thread_update_interval, 100, "thread update robot interval， ms");
+
 
 //cmd 监听
 DEFINE_int32(cmd_port, 8889, "cmd listen port");
 DEFINE_int32(cmd_client_num, 2, "cmd listen client limit");
 
 //datareport
-//if set, will report to svr
+//if set, will report stat to svr
 DEFINE_string(datasvr_ip, "", "datacollect svr ip");
 DEFINE_int32(datasvr_port, 0, "datacollect svr port");
+

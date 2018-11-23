@@ -200,11 +200,11 @@ void Mother::OnMessageFromChild(int fd, short event)
 {
     DLOG(INFO) << "Receive stat from child";
 
-    ChildReportStat_t stat;
+    ChildReportStat_t report;
     uint32_t prio = 0;
     ssize_t len = 0;
 
-    while ((len = mq_receive(m_child_mq.mq, reinterpret_cast<char*>(&stat), sizeof(ChildReportStat_t), &prio)) != -1) {
+    while ((len = mq_receive(m_child_mq.mq, reinterpret_cast<char*>(&report), sizeof(ChildReportStat_t), &prio)) != -1) {
         DLOG(INFO) << "Read mq len : " << len << " prio : " << prio;
         // handle message from child
 
@@ -224,10 +224,8 @@ void Mother::OnUpdate(void)
         //DLOG(INFO) << "Timer";
         t_count = 0;
 
-#if 0
-        ChildReportStat_t stat;
-        ReportStat(stat);
-#endif
+        MotherSendCmd_t cmd;
+        m_childs[0]->SendCmd(cmd);
     }
 }
 

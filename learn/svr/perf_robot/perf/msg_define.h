@@ -11,6 +11,7 @@
 
 #include "common.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 //  虎妈与熊孩子间的消息定义
 //  虎妈与熊孩子通信
@@ -22,11 +23,11 @@ namespace perf_robot {
 
 typedef struct ChildReportStat {
 
-    int thread_id;
-    common::PerfStat_t stat;
+    int id;
+    const common::PerfStat_t* pstat;
 
     ChildReportStat()
-        :thread_id(-1), stat()
+        :id(0), pstat(NULL)
     {}
 } ChildReportStat_t;
 

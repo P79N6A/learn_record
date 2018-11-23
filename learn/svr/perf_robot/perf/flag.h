@@ -20,6 +20,7 @@ DECLARE_int32(perf_robot_start_id);
 DECLARE_int32(perf_robot_send_per_sec);
 
 DECLARE_int32(report_mq_size);
+DECLARE_int32(thread_update_interval);
 
 DECLARE_int32(cmd_port);
 DECLARE_int32(cmd_client_num);

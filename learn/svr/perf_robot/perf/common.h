@@ -27,6 +27,7 @@ enum PerfRetCode {
     kPerfRetcodeChildMqErr,
     kPerfRetcodeCreateThreadErr,
     kPerfRetcodeNewKidErr,
+    kPerfRetcodeCreatePipeErr,
 
     kPerfRetcodeChildNotInit = 700,
 
@@ -57,10 +58,6 @@ typedef struct PerfStat {
         connected_num(0)
     {}
 } PerfStat_t;
-
-
-
-
 
 
 #pragma pack(pop)
