@@ -11,6 +11,7 @@
 
 #include "common.h"
 #include <stdint.h>
+#include <map>
 
 namespace perf_robot {
 
@@ -22,7 +23,8 @@ public:
 
 private:
     uint32_t m_id;
-
+    uint64_t m_msg_id;
+    map<uint64_t, uint64_t> m_msg_wait; // <m_msg_id, time_out_point>
 };
 
 } // namespace perf_robot
