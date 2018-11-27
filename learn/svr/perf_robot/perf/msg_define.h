@@ -24,10 +24,10 @@ namespace perf_robot {
 typedef struct ChildReportStat {
 
     int id;
-    const common::PerfStat_t* pstat;
+    common::PerfStat_t stat;
 
     ChildReportStat()
-        :id(0), pstat(NULL)
+        :id(0), stat()
     {}
 } ChildReportStat_t;
 

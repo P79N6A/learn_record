@@ -66,6 +66,11 @@ public:
     void Stop(void);
 
     int SendCmd(const MotherSendCmd_t &cmd);
+
+    const struct sockaddr_in& GetServerAddr(void) const {
+        return m_server_addr;
+    }
+
 private:
     NaughtyKid(): m_mother(NULL), m_id(0) {}
 
@@ -79,6 +84,9 @@ private:
     uint32_t m_robot_start_id;
     uint32_t m_robot_num;
     std::vector<Robot*> m_robots;
+
+    struct sockaddr_in m_server_addr;
+
     common::PerfStat_t m_perf_stat;
 
     struct event_base *m_event_base;

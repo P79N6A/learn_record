@@ -8,6 +8,9 @@
 #include "naughty_kid.h"
 #include "mother.h"
 #include "flag.h"
+#include "robot.h"
+
+#include <arpa/inet.h>
 
 namespace perf_robot {
 
@@ -43,6 +46,11 @@ NaughtyKid::~NaughtyKid()
     }
     close(m_send_cmd_fd);
     close(m_rev_cmd_fd);
+
+    for(auto iter = m_robots.begin(); iter != m_robots.end(); ++iter) {
+        delete *iter;
+        *iter = NULL;
+    }
 }
 
 int NaughtyKid::Init(uint32_t robot_start_id, uint32_t robot_num)
@@ -79,7 +87,26 @@ int NaughtyKid::Init(uint32_t robot_start_id, uint32_t robot_num)
     event_add(m_cmd_event, NULL);
     event_priority_set(m_timer_event, 2);
 
+
+    memset(&m_server_addr, 0, sizeof(m_server_addr));
+    m_server_addr.sin_family = AF_INET;
+    m_server_addr.sin_port = htons(FLAGS_server_port);
+    inet_aton(FLAGS_server_ip.c_str(), &m_server_addr.sin_addr);
+
     // init robot
+    uint32_t robot_id = robot_start_id;
+    int ret;
+    for (int i = 0; i < robot_num; ++i) {
+        Robot* robot = new Robot(this, robot_id);
+        if (robot == NULL) {
+            return common::kPerfRetcodeNewRobotErr;
+        }
+        int ret = robot->Init();
+        if (ret != common::kPerfRetcodeOk) {
+            return ret;
+        }
+        ++robot_id;
+    }
 
     return common::kPerfRetcodeOk;
 }
@@ -109,7 +136,7 @@ void NaughtyKid::Run(void)
     sleep(1);
     ChildReportStat_t report;
     report.id = m_id;
-    report.pstat = &m_perf_stat;
+    report.stat = m_perf_stat;
     m_mother->ReportStat(report, m_id);
 
     event_base_dispatch(m_event_base);

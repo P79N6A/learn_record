@@ -220,13 +220,18 @@ void Mother::OnMessageFromChild(int fd, short event)
 void Mother::OnUpdate(void)
 {
     static uint8_t t_count = 0;
+    // per 1s
     if (++t_count >= 10) {
-        //DLOG(INFO) << "Timer";
         t_count = 0;
 
-        MotherSendCmd_t cmd;
-        m_childs[0]->SendCmd(cmd);
+        //MotherSendCmd_t cmd;
+        //m_childs[0]->SendCmd(cmd);
     }
+
+    // per 100 ms
+
+
+
 }
 
 void Mother::OnCmdError(struct bufferevent *bev, short event)

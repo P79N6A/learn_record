@@ -18,6 +18,8 @@ DEFINE_int32(perf_robot_start_id, 1, "robot start id");
 DEFINE_int32(perf_robot_send_per_sec, 10, "send speed /s");
 
 DEFINE_bool(auto_start_robot, true, "start robot auto when perf_robot run");
+// 发包方式，同步异步, 默认异步，一直发
+DEFINE_bool(robot_send_sync, false, "send after rev previous rsp");
 
 //内部设置
 DEFINE_int32(report_mq_size, FLAGS_perf_work_thread_num * 3, "mq for child report stat to mother");

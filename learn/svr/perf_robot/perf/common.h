@@ -28,6 +28,7 @@ enum PerfRetCode {
     kPerfRetcodeCreateThreadErr,
     kPerfRetcodeNewKidErr,
     kPerfRetcodeCreatePipeErr,
+    kPerfRetcodeNewRobotErr,
 
     kPerfRetcodeChildNotInit = 700,
 

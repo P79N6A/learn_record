@@ -19,6 +19,10 @@ DECLARE_int32(perf_robot_num);
 DECLARE_int32(perf_robot_start_id);
 DECLARE_int32(perf_robot_send_per_sec);
 
+DECLARE_bool(auto_start_robot);
+DECLARE_bool(robot_send_sync);
+
+
 DECLARE_int32(report_mq_size);
 DECLARE_int32(thread_update_interval);
 
