@@ -7,7 +7,10 @@
 
 #include<iostream>
 #include<memory>
+#include <vector>
 //auto_prt 和 shared_ptr 的差别
+using namespace std;
+typedef shared_ptr<int> IntPtr_t;
 void self_del(int* ptr)
 {
     std::cout << "call selfdef delfun value : " << *ptr << std::endl;
@@ -28,6 +31,42 @@ class TestObj {
 
 int main(int argc, char *argv[])
 {
+    cout << " --- Test one" << endl;
+    {
+
+    weak_ptr<int> wptr;
+    {
+        vector<IntPtr_t> vInt;
+        for (auto i = 0; i < 10; ++i) {
+            IntPtr_t ptr = make_shared<int>(i);
+            vInt.push_back(ptr);
+        }
+        for (auto iter = vInt.begin(); iter != vInt.end(); ++iter) {
+            cout <<  "Pointer : "  << iter->get()  << " Value : " <<*(iter->get()) << " uer countt " << (iter->use_count())<< endl;
+        }
+
+        wptr = vInt[4];
+        cout << "after wptr " << vInt[4].use_count() << endl;
+        IntPtr_t sptr = vInt[4];
+        cout << "after sptr " << vInt[4].use_count() << endl;
+
+        if (auto ptr = wptr.lock()) {
+            cout << " weak_ptr : " << *ptr << endl;
+        }
+    }
+
+    if (auto ptr = wptr.lock()) {
+        cout << " weak_ptr : " << *ptr << endl;
+    } else {
+        cout << "vInt expired" << endl;
+    }
+
+
+    }
+
+    cout << " --- Test two" << endl;
+
+
     std::shared_ptr<int> iPtr = std::make_shared<int>(1);
     std::cout << *iPtr << std::endl;
 
@@ -46,5 +85,8 @@ int main(int argc, char *argv[])
     std::cout << testObjPtr2->get() << std::endl;
 
     std::cout << "--- end" << std::endl;
+
+
+
     return 0;
 }
