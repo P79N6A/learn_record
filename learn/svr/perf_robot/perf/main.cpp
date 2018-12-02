@@ -13,15 +13,14 @@
 #include <sys/file.h>
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-
-
 DECLARE_string(flagfile);
 
-static perf_robot::Mother *g_mother = NULL;
+static std::unique_ptr<perf_robot::Mother> g_mother;
 
 static void sigIntHandler(int signum)
 {
@@ -29,7 +28,7 @@ static void sigIntHandler(int signum)
         g_mother->StopLoop();
         LOG(INFO) << "SIGINT, Exit...";
     }
-    signal(SIGINT, sigIntHandler);
+    //signal(SIGINT, sigIntHandler);
 }
 
 static void save_pid(pid_t pid)
@@ -59,7 +58,7 @@ int main(int argc, char* argv[])
     signal(SIGPIPE, SIG_IGN);
 #endif
 
-    g_mother = new perf_robot::Mother();
+    g_mother.reset(new perf_robot::Mother());
 
     int ret = g_mother->Init(_pid);
     if (ret != 0) {
@@ -75,6 +74,5 @@ int main(int argc, char* argv[])
         }
     }
 
-    delete g_mother;
     return 0;
 }

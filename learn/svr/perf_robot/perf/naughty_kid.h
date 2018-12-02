@@ -11,11 +11,13 @@
 
 #include "msg_define.h"
 #include "common.h"
+#include "robot.h" //??
 
 #include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <vector>
+#include <memory>
 
 #include <event2/event.h>
 #include <event2/listener.h>
@@ -47,6 +49,8 @@ private:
 
 class Mother;
 class Robot; // 具体一个连接管理
+typedef std::unique_ptr<Robot> RobotPtr_t;
+
 class NaughtyKid : public Thread {
 
     friend void OnChildUpdateWrapper(int fd, short event, void *argc);
@@ -83,7 +87,7 @@ private:
 
     uint32_t m_robot_start_id;
     uint32_t m_robot_num;
-    std::vector<Robot*> m_robots;
+    std::vector<RobotPtr_t> m_robots;
 
     struct sockaddr_in m_server_addr;
 

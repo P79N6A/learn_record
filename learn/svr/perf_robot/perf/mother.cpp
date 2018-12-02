@@ -61,24 +61,29 @@ Mother::~Mother()
 {
     for (auto iter = m_childs.begin(); iter != m_childs.end(); ++iter) {
         (*iter)->Stop();
-        delete *iter;
-        *iter = NULL;
     }
+    m_childs.clear();
+
     if (m_cmd_listener) {
         evconnlistener_free(m_cmd_listener);
+        m_cmd_listener =NULL;
     }
     if (m_timer_event) {
         event_free(m_timer_event);
+        m_timer_event = NULL;
     }
     if (m_mq_event) {
         event_free(m_mq_event);
+        m_mq_event = NULL;
     }
     if (m_event_base) {
         event_base_free(m_event_base);
+        m_event_base = NULL;
     }
     if (m_child_mq.mq != -1) {
         mq_unlink(m_child_mq.name.c_str());
         mq_close(m_child_mq.mq);
+        m_child_mq.mq = -1;
     }
 }
 
@@ -158,7 +163,7 @@ int Mother::Init(pid_t my_pid)
         robot_remain = FLAGS_perf_robot_num % FLAGS_perf_work_thread_num;
     }
     for (int i = 0; i < FLAGS_perf_work_thread_num; ++i) {
-        NaughtyKid *child = new NaughtyKid(this, i);
+        NaughtyKidPtr_t child(new NaughtyKid(this, i));
         if (!child) {
             return common::kPerfRetcodeNewKidErr;
         }
@@ -172,7 +177,7 @@ int Mother::Init(pid_t my_pid)
             return ret;
         }
         robot_start_id += robot_num;
-        m_childs.push_back(child);
+        m_childs.push_back(move(child));
     }
 
     LOG(INFO) << "perf_robot Init ok, pid " << my_pid;
@@ -181,6 +186,10 @@ int Mother::Init(pid_t my_pid)
 
 int Mother::StartLoop()
 {
+    if (!m_event_base) {
+        return common::kPerfRetcodeMotherNotInit;
+    }
+
     // start all childs
     for (auto iter = m_childs.begin(); iter != m_childs.end(); ++iter) {
         int ret = (*iter)->Start();

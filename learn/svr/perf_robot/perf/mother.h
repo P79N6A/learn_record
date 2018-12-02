@@ -15,6 +15,7 @@
 #include <mqueue.h>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <event2/event.h>
 #include <event2/listener.h>
@@ -38,6 +39,8 @@ typedef struct MqStruct {
 } MqStruct_t;
 
 class NaughtyKid;
+typedef std::unique_ptr<NaughtyKid> NaughtyKidPtr_t;
+
 class Mother {
 
     friend void OnMessageFromChildWrapper(int fd, short event, void *argc);
@@ -86,7 +89,7 @@ private:
 
     evconnlistener *m_cmd_listener;
 
-    std::vector<NaughtyKid*> m_childs;
+    std::vector<NaughtyKidPtr_t> m_childs;
 };
 } // namespace perf_robot
 #endif //PERF_ROBOT_PERF_MOTHER_H

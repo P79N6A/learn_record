@@ -47,10 +47,7 @@ NaughtyKid::~NaughtyKid()
     close(m_send_cmd_fd);
     close(m_rev_cmd_fd);
 
-    for(auto iter = m_robots.begin(); iter != m_robots.end(); ++iter) {
-        delete *iter;
-        *iter = NULL;
-    }
+    m_robots.clear();
 }
 
 int NaughtyKid::Init(uint32_t robot_start_id, uint32_t robot_num)
@@ -97,7 +94,7 @@ int NaughtyKid::Init(uint32_t robot_start_id, uint32_t robot_num)
     uint32_t robot_id = robot_start_id;
     int ret;
     for (int i = 0; i < robot_num; ++i) {
-        Robot* robot = new Robot(this, robot_id);
+        RobotPtr_t robot(new Robot(this, robot_id));
         if (robot == NULL) {
             return common::kPerfRetcodeNewRobotErr;
         }
@@ -105,6 +102,7 @@ int NaughtyKid::Init(uint32_t robot_start_id, uint32_t robot_num)
         if (ret != common::kPerfRetcodeOk) {
             return ret;
         }
+        m_robots.push_back(move(robot));
         ++robot_id;
     }
 

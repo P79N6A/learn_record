@@ -31,6 +31,7 @@ enum PerfRetCode {
     kPerfRetcodeNewRobotErr,
 
     kPerfRetcodeChildNotInit = 700,
+    kPerfRetcodeMotherNotInit,
 
 };
 
