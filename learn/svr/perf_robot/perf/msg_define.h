@@ -27,7 +27,8 @@ typedef struct ChildReportStat {
     common::PerfStat_t stat;
 
     ChildReportStat()
-        :id(0), stat()
+        : id(0)
+        , stat()
     {}
 } ChildReportStat_t;
 

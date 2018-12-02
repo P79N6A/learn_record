@@ -51,10 +51,11 @@ void OnCmdErrorWrapper(struct bufferevent *bev, short event, void *argc)
 }
 
 Mother::Mother()
-    : m_event_base(NULL),
-    m_mq_event(NULL), m_child_mq(),
-    m_timer_event(NULL),
-    m_cmd_listener(NULL)
+    : m_event_base(NULL)
+    , m_mq_event(NULL), m_child_mq()
+    , m_timer_event(NULL)
+    , m_cmd_listener(NULL)
+    , m_childs()
 {}
 
 Mother::~Mother()
@@ -63,6 +64,7 @@ Mother::~Mother()
         (*iter)->Stop();
     }
     m_childs.clear();
+    //std::vector<NaughtyKidPtr_t>().swap(m_childs);
 
     if (m_cmd_listener) {
         evconnlistener_free(m_cmd_listener);
@@ -94,7 +96,6 @@ int Mother::Init(pid_t my_pid)
         return common::kPerfRetcodeNewBaseEventErr;
     }
     event_base_priority_init(m_event_base, 1);
-
 
     // child mq
     char mq_name[256];
@@ -213,7 +214,9 @@ void Mother::OnMessageFromChild(int fd, short event)
     uint32_t prio = 0;
     ssize_t len = 0;
 
-    while ((len = mq_receive(m_child_mq.mq, reinterpret_cast<char*>(&report), sizeof(ChildReportStat_t), &prio)) != -1) {
+    while ((len = mq_receive(m_child_mq.mq,
+                    reinterpret_cast<char*>(&report),
+                    sizeof(ChildReportStat_t), &prio)) != -1) {
         DLOG(INFO) << "Read mq len : " << len << " prio : " << prio;
         // handle message from child
 

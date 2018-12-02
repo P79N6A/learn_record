@@ -1,7 +1,7 @@
 #!/bin/bash
 # by orientlu
 
-rm ./perf -f
+rm ./robot_perf -f
 
 pwd
 

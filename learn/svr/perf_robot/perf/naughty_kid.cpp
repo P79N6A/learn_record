@@ -27,9 +27,10 @@ void OnRevCmdWrapper(int fd, short event, void *argc)
 }
 
 NaughtyKid::NaughtyKid(const Mother *mother, uint16_t kid_id)
-    : m_mother(mother), m_id(kid_id),
-    m_robot_start_id(0), m_robot_num(0), m_robots(), m_perf_stat(),
-    m_event_base(NULL), m_timer_event(NULL), m_cmd_event(NULL)
+    : m_mother(mother), m_id(kid_id)
+    , m_robot_start_id(0), m_robot_num(0), m_robots(), m_perf_stat()
+    , m_event_base(NULL), m_timer_event(NULL), m_cmd_event(NULL)
+    , m_rev_cmd_fd(-1), m_send_cmd_fd(-1)
 {
 }
 
@@ -44,8 +45,12 @@ NaughtyKid::~NaughtyKid()
     if (m_event_base) {
         event_base_free(m_event_base);
     }
-    close(m_send_cmd_fd);
-    close(m_rev_cmd_fd);
+    if (m_send_cmd_fd) {
+        close(m_send_cmd_fd);
+    }
+    if (m_rev_cmd_fd) {
+        close(m_rev_cmd_fd);
+    }
 
     m_robots.clear();
 }
@@ -111,7 +116,7 @@ int NaughtyKid::Init(uint32_t robot_start_id, uint32_t robot_num)
 
 int NaughtyKid::SendCmd(const MotherSendCmd_t &cmd)
 {
-    return write(m_send_cmd_fd,&cmd , sizeof(MotherSendCmd_t));
+    return write(m_send_cmd_fd, &cmd, sizeof(MotherSendCmd_t));
 }
 
 // start thread

@@ -54,10 +54,10 @@ typedef struct PerfStat {
     uint32_t connected_num;
 
     PerfStat()
-        : send_count(0),receive_count(0),
-        error_count(0),timeout_count(0),success_count(0),
-        avg_delay_us(0),max_delay_us(0),min_delay_us(0),
-        connected_num(0)
+        : send_count(0), receive_count(0)
+        , error_count(0), timeout_count(0), success_count(0)
+        , avg_delay_us(0), max_delay_us(0), min_delay_us(0)
+        , connected_num(0)
     {}
 } PerfStat_t;
 

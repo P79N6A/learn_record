@@ -4,9 +4,9 @@
 --server_port=8888
 
 ## perf config
---perf_work_thread_num=2
+--perf_work_thread_num=4
 ## default : cpu num
---perf_robot_num=20
+--perf_robot_num=100
 ## 连接数，分摊到 work thread
 --perf_robot_start_id=1
 ## 连接自定义id, 递增, >0
