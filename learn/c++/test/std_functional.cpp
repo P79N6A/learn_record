@@ -40,6 +40,13 @@ class PrintMsgClass {
         }
 };
 
+void testBindRef(int &a, int &b, const int &c)
+{
+    std::cout << "In testBindRef " << a << b << c << std::endl;
+    ++a;
+    ++b;
+}
+
 void test_bind(int a, int b, int c)
 {
     std::cout << a << b << c << std::endl;
@@ -74,6 +81,17 @@ int main(int argc, char *argvp[])
     f71(1);
     f72(2);
     f73(1,3);
+
+    std::cout << "Bind wiht reference" << std::endl;
+    int a = 1, b = 2, c = 3;
+    std::function<void(void)> f81 = std::bind(&testBindRef, a, b , c);
+    std::function<void(void)> f82 = std::bind(&testBindRef, a, std::ref(b) , std::cref(c));
+    ++a; ++b;
+    std::cout << "Before fun " << a << b << c << std::endl;
+    f81();
+    std::cout << "after fun81 " << a << b << c<< std::endl;
+    f82();
+    std::cout << "after fun82 " << a << b << c << std::endl;
 
     return 0;
 }
