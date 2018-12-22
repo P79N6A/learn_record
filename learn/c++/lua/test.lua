@@ -16,5 +16,5 @@ function mul(x, y)
 end
 
 -- will run when dofile
-print("--> lua call ")
+print("--> lua call by cpp")
 print(add(1,2))

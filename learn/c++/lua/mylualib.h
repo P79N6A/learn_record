@@ -9,18 +9,7 @@
 #define _MYLUALIB_H
 #pragma once
 
- extern "C" {
-     #include <lua.h>
-     #include <lualib.h>
-     #include <lauxlib.h>
-
- }
-
-//#ifdef LUA_EXPORTS
-//#define LUA_API __declspec(dllexport)
-//#else
-//#define LUA_API __declspec(dllimport)
-//#endif
+#include <lua.hpp>
 
 /// call by lua when require
 extern "C" int luaopen_mylualib(lua_State *L);
